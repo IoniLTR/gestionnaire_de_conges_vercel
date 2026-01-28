@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDBConnection } from "@/lib/db";
 import { hashPassword, looksLikeBcryptHash, verifyPassword } from "@/lib/password";
-import { loginSchema } from "@/lib/validation";
 import { RowDataPacket } from "mysql2";
 
 // Définition du type exact de la table user que l'on récupère
@@ -39,7 +38,10 @@ export async function POST(req: Request) {
     const user = rows[0];
 
     if (!user.mdp) {
-      return NextResponse.json({ error: "Compte non activé. Merci de finaliser votre inscription." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Compte non activé. Merci de finaliser votre inscription." },
+        { status: 403 }
+      );
     }
 
     let ok = false;
@@ -53,7 +55,10 @@ export async function POST(req: Request) {
       // If it matches, we upgrade to bcrypt immediately
       if (ok) {
         const newHash = await hashPassword(password);
-        await connection.execute("UPDATE user SET mdp = ? WHERE id_user = ?", [newHash, user.id_user]);
+        await connection.execute("UPDATE user SET mdp = ? WHERE id_user = ?", [
+          newHash,
+          user.id_user,
+        ]);
       }
     }
 
@@ -61,13 +66,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Mot de passe incorrect" }, { status: 401 });
     }
 
-    const res = NextResponse.json({ success: true, user });
+    // ⚠️ Optionnel mais conseillé : ne pas renvoyer mdp au front
+    const { mdp, ...safeUser } = user as any;
 
-    // 🔐 On pose juste un cookie "userId"
+    const res = NextResponse.json({ success: true, user: safeUser });
+
+    // 🔐 Cookie session
+    // ✅ secure MUST be true in production (Vercel = HTTPS)
     res.cookies.set("userId", String(user.id_user), {
       httpOnly: true,
       sameSite: "lax",
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: 60 * 60 * 24 * 7, // 7 jours
     });
@@ -81,6 +90,11 @@ export async function POST(req: Request) {
     console.error("Erreur API login :", err);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   } finally {
-    await connection.end();
+    // ✅ IMPORTANT: pool connection => release(), pas end()
+    try {
+      connection.release();
+    } catch {
+      // no-op (au cas où)
+    }
   }
 }
