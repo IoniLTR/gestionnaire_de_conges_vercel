@@ -42,7 +42,7 @@ export async function GET(_req: NextRequest) {
     console.error("Erreur GET /api/user-setting:", error);
     return NextResponse.json({ success: false, error: "Erreur serveur" }, { status: 500 });
   } finally {
-    await connection.end();
+    connection.release();
   }
 }
 
@@ -109,6 +109,6 @@ export async function POST(req: NextRequest) {
     console.error("Erreur POST /api/user-setting:", error);
     return NextResponse.json({ success: false, error: "Erreur serveur" }, { status: 500 });
   } finally {
-    await connection.end();
+    connection.release();
   }
 }

@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       [email]
     );
 
-    await connection.end();
+    connection.release();
 
     if (rows.length === 0) {
       return NextResponse.json({ error: "Utilisateur non trouvé" }, { status: 404 });
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     }, { status: 200 });
 
   } catch (err: unknown) {
-    await connection.end();
+     connection.release();
     if (err instanceof Error) {
       console.error("Erreur API forgot-password :", err.message);
       return NextResponse.json({ error: err.message }, { status: 500 });

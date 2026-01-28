@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
       await conn.rollback();
       throw err;
     } finally {
-      await conn.end();
+      conn.release();
     }
   } catch (error) {
     console.error("Erreur update-solde:", error);

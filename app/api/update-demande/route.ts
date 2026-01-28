@@ -193,6 +193,6 @@ const cookieStore = await cookies();
     console.error("Erreur API update-demande:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   } finally {
-    await conn.end();
+    conn.release();
   }
 }

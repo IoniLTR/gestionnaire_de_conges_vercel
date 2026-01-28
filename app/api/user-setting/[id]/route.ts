@@ -32,7 +32,7 @@ export async function DELETE(
     console.error("Erreur DELETE user:", err);
     return NextResponse.json({ success: false, error: "Erreur suppression" }, { status: 500 });
   } finally {
-    await connection.end();
+    connection.release();
   }
 }
 

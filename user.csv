@@ -1,0 +1,4 @@
+id_user,nom,prenom,mail,statut,poste,date_entree,solde_conge,solde_hsup,photo,mdp
+18,utilisateur,rh,rh@gmail.com,au travail,RH,2026-01-28,0.00,0.00,/uploads/default.jpeg,$2b$12$g0utPS59ZLS5WKONJW1xaO.zeyPwAVyhjHXEmtOlM4OW0B9jM6ToS
+19,utilisateur,admin,admin@gmail.com,au travail,admin,2026-01-27,0.00,0.00,/uploads/default.jpeg,$2b$12$L8URTyo.N.K7xLQXLBTJEuaDH5R/esLmCldsHS/4WePaV6a1z71g6
+20,utilisateur,salarié,user@gmail.com,au travail,salarié,2026-01-27,0.00,0.00,/uploads/default.jpeg,$2b$12$/ibf/XoQab9qSFRNEYE1u.kwEd3Uk2U4qyF4DY3NXuMgyClFZAepm
