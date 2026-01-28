@@ -26,7 +26,7 @@ const cookieStore = await cookies();
     // - Crédit (variation > 0) => motif + dateAction obligatoires (pour calcul majorations)
     // - Débit (variation < 0) => on retire exactement la valeur saisie, sans majoration.
     if (type === 'hsup') {
-        const v = parseFloat(variation);
+        const v = Number(variation);
         if (v > 0) {
           if (!motif || motif.trim() === '') return NextResponse.json({ error: "Motif obligatoire." }, { status: 400 });
           if (!dateAction) return NextResponse.json({ error: "Date/Heure obligatoire pour le calcul." }, { status: 400 });
