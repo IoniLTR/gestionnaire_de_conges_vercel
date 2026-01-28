@@ -46,24 +46,24 @@ const cookieStore = await cookies();
       if (!isAllowed) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
 
       await conn.beginTransaction();
+let finalVariation = Number(variation);
+let dureeReelle = 0;
 
-      let finalVariation = parseFloat(variation);
-      let dureeReelle = 0;
+// ✅ CALCUL AUTOMATIQUE UNIQUEMENT SI CRÉDIT
+if (type === 'hsup') {
+  const raw = Number(variation);
+  if (raw > 0) {
+    dureeReelle = raw; // Durée brute réellement travaillée
+    const dateObj = new Date(dateAction);
+    const result = await calculateRecoveryHours(conn, targetUserId, dateObj, dureeReelle);
+    finalVariation = result.toCredit; // crédit majoré
+  } else {
+    // Débit: on retire exactement (ex: -1 => -1)
+    finalVariation = raw;
+    dureeReelle = 0;
+  }
+}
 
-      // ✅ CALCUL AUTOMATIQUE UNIQUEMENT SI CRÉDIT
-      if (type === 'hsup') {
-          const raw = parseFloat(variation);
-          if (raw > 0) {
-            dureeReelle = raw; // Durée brute réellement travaillée
-            const dateObj = new Date(dateAction);
-            const result = await calculateRecoveryHours(conn, targetUserId, dateObj, dureeReelle);
-            finalVariation = result.toCredit; // crédit majoré
-          } else {
-            // Débit: on retire exactement (ex: -1 => -1)
-            finalVariation = raw;
-            dureeReelle = 0;
-          }
-      }
 
       // Update User
       const [targets] = await conn.query<RowDataPacket[]>("SELECT solde_conge, solde_hsup FROM user WHERE id_user = ?", [targetUserId]);
